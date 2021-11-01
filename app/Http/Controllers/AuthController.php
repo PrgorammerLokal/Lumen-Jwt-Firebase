@@ -45,6 +45,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'mahasiswa'
         ]);
 
         if ($user) {
@@ -81,5 +82,10 @@ class AuthController extends Controller
             'exp' => time() + 60 * 60 // Expiration time
         ];
         return JWT::encode($payload, env('JWT_SECRET'));
+    }
+
+    public function tes()
+    {
+        return 'tes middleware';
     }
 }
