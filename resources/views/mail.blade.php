@@ -1,2 +1,2 @@
-<h1>Hi, {{ $name }}</h1>
-<p>Sending Mail using Lumen.</p>
+<h1>Silahkan copy kode dibawah ini untuk melakukan reset password</h1>
+<p>{{ $code }}</p>

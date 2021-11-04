@@ -87,6 +87,7 @@ $app->routeMiddleware([
     // 'auth' => App\Http\Middleware\Authenticate::class,
     'auth.jwt' => App\Http\Middleware\JwtMiddleware::class,
     'role' => App\Http\Middleware\RoleMiddleware::class,
+    'token' => App\Http\Middleware\TokenMiddleware::class
 ]);
 
 /*

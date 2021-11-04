@@ -22,6 +22,7 @@ $router->group(['prefix' => 'auth'], function () use ($router) {
     $router->post('login', 'AuthController@login');
     $router->post('register', 'AuthController@register');
     $router->post('reset/sendmail', 'AuthController@sendmail');
+    $router->post('reset/password', ['middleware' => 'token', 'uses' => 'AuthController@reset']);
 });
 // route posts
 $router->group(['prefix' => 'posts'], function () use ($router) {

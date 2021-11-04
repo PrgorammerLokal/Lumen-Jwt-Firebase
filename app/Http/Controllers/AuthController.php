@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ResetPassword;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -92,12 +93,68 @@ class AuthController extends Controller
 
     public function sendmail(Request $request)
     {
-        $this->validate($request, ['email' => 'required|email:dns']);
+        $this->validate($request, [
+            'email' => 'required|email:dns'
+        ]);
 
-        $user = User::where('email', $request->email);
+        $user = User::where('email', $request->email)->first();
         if ($user) {
             $kode = Str::random(32);
             $data = ["code" => $kode];
+            $cek = ResetPassword::where('email', $user->email)->first();
+            if ($cek) {
+                $cek->token = $kode;
+                $cek->save();
+                Mail::send('mail', $data, function ($message) use ($user) {
+                    $message->to($user->email, 'Programmer Lokal')->subject('Tes email');
+                    $message->from('achmadfawait66@gmail.com', 'Programmer Lokal');
+                });
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Please check email for you get code'
+                ], 200);
+            }
+            ResetPassword::create([
+                'email' => $user->email,
+                'token' => $kode
+            ]);
+            Mail::send('mail', $data, function ($message) use ($user) {
+                $message->to($user->email, 'Programmer Lokal')->subject('Kode Verifikasi Reset Password');
+                $message->from('achmadfawait66@gmail.com', 'Programmer Lokal');
+            });
+            return response()->json([
+                'status' => true,
+                'message' => 'Please check email for you get code'
+            ], 200);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'Email Un Registered'
+        ], 404);
+    }
+
+    public function reset(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'required|email:dns',
+            'password' => 'required|min:8'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            $reset = ResetPassword::where('email', $user->email)->first();
+            if ($user->email == $reset->email && $reset->token == $request->header('token')) {
+                $user->password = Hash::make($request->password);
+                $user->save();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Password has been reset, Please login'
+                ], 200);
+            }
+            return response()->json([
+                'status' => false,
+                'message' => 'Email or token is invalid'
+            ], 404);
         }
         return response()->json([
             'status' => false,
