@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Firebase\JWT\JWT;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -87,5 +88,20 @@ class AuthController extends Controller
     public function tes()
     {
         return 'tes middleware';
+    }
+
+    public function sendmail(Request $request)
+    {
+        $this->validate($request, ['email' => 'required|email:dns']);
+
+        $user = User::where('email', $request->email);
+        if ($user) {
+            $kode = Str::random(32);
+            $data = ["code" => $kode];
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'Email Un Registered'
+        ], 404);
     }
 }
