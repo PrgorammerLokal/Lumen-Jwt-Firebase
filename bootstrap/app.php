@@ -86,8 +86,11 @@ $app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
 $app->routeMiddleware([
     // 'auth' => App\Http\Middleware\Authenticate::class,
     'auth.jwt' => App\Http\Middleware\JwtMiddleware::class,
-    'role' => App\Http\Middleware\RoleMiddleware::class,
-    'token' => App\Http\Middleware\TokenMiddleware::class
+    // 'access' => App\Http\Middleware\RoleMiddleware::class,
+    'token' => App\Http\Middleware\TokenMiddleware::class,
+    'auth'       => App\Http\Middleware\Authenticate::class,
+    'permission' => Spatie\Permission\Middlewares\PermissionMiddleware::class,
+    'role'       => Spatie\Permission\Middlewares\RoleMiddleware::class,
 ]);
 
 /*
@@ -105,6 +108,9 @@ $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+$app->configure('permission');
+$app->alias('cache', \Illuminate\Cache\CacheManager::class);  // if you don't have this already
+$app->register(Spatie\Permission\PermissionServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

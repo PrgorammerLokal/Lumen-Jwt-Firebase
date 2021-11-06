@@ -47,8 +47,9 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'mahasiswa'
+            'role' => $request->role
         ]);
+        $user->assignRole($request->role);
 
         if ($user) {
             return response()->json([
