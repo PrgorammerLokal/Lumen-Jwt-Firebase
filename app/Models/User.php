@@ -31,4 +31,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password',
     ];
+
+    public function getEmail()
+    {
+        $email = Crypt::decrypt($this->getAttribute('email'));
+        return $email;
+    }
 }

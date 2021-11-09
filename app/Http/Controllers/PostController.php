@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 
 class PostController extends Controller
 {
@@ -15,16 +16,20 @@ class PostController extends Controller
         ]);
 
         $post = Post::create([
-            'title' => $request->title,
-            "body" => $request->body,
+            'title' => Crypt::encrypt($request->title),
+            "body" => Crypt::encrypt($request->body),
             "image" => $request->image,
         ]);
-
+        $decrypt = array(
+            'title'=>Crypt::decrypt($post->title),
+            'body'=>Crypt::decrypt($post->body),
+            'image'=>$post->image
+        );
         if ($post) {
             return response()->json([
                 'status' => true,
                 "message" => "Post Created !",
-                "data" => $post
+                "data" => $decrypt
             ], 201);
         }
         return response()->json([
@@ -43,14 +48,19 @@ class PostController extends Controller
 
         $post = Post::find($id);
         if ($post) {
-            $post->title = $request->title;
-            $post->body = $request->body;
+            $post->title = Crypt::encrypt($request->title);
+            $post->body =Crypt::encrypt($request->body);
             $post->image = $request->image;
             $post->save();
+            $decrypt = array(
+                'title'=>Crypt::decrypt($post->title),
+                'body'=>Crypt::decrypt($post->body),
+                'image'=>$post->image
+            );
             return response()->json([
                 'status' => true,
                 "message" => "Post Updated !",
-                "data" => $post
+                "data" => $decrypt
             ], 200);
         }
         return response()->json([
@@ -80,7 +90,15 @@ class PostController extends Controller
 
     public function all()
     {
-        $posts = Post::all();
+        $posts =[];
+        foreach (Post::all() as $key) {
+            $data = [
+                'title'=>Crypt::decrypt($key->title),
+                'body'=>Crypt::decrypt($key->body),
+                'image'=>$key->image,
+            ];
+            array_push($posts,$data);
+        }
         return response()->json([
             'status' => true,
             "message" => "Success !",
@@ -91,12 +109,16 @@ class PostController extends Controller
     public function find($id)
     {
         $post = Post::find($id);
-
+        $decrypt = array(
+            'title'=>Crypt::decrypt($post->title),
+            'body'=>Crypt::decrypt($post->body),
+            'image'=>$post->image
+        );
         if ($post) {
             return response()->json([
                 'status' => true,
                 "message" => "Success !",
-                "data" => $post
+                "data" => $decrypt
             ], 200);
         }
         return response()->json([

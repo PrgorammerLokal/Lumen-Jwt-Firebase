@@ -58,7 +58,8 @@ $app->singleton(
 | the default version. You may register other files below as needed.
 |
 */
-
+$app->key = env('APP_KEY', 'yNNH04mZplp7xDWTnw3r8AVvAiiAPtA7');
+$app->cipher = 'AES-256-CBC';
 $app->configure('app');
 $app->configure('mail');
 
@@ -88,9 +89,10 @@ $app->routeMiddleware([
     'auth.jwt' => App\Http\Middleware\JwtMiddleware::class,
     // 'access' => App\Http\Middleware\RoleMiddleware::class,
     'token' => App\Http\Middleware\TokenMiddleware::class,
-    'auth'       => App\Http\Middleware\Authenticate::class,
+    // 'auth'       => App\Http\Middleware\Authenticate::class,
     'permission' => Spatie\Permission\Middlewares\PermissionMiddleware::class,
     'role'       => Spatie\Permission\Middlewares\RoleMiddleware::class,
+    // 'throttle' => App\Http\Middleware\ThrottleRequests::class,
 ]);
 
 /*
@@ -111,6 +113,7 @@ $app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->configure('permission');
 $app->alias('cache', \Illuminate\Cache\CacheManager::class);  // if you don't have this already
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
+$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

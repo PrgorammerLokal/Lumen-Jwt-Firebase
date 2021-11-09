@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 class AuthController extends Controller
 {
@@ -18,8 +20,7 @@ class AuthController extends Controller
             'email' => 'required|email:dns',
             'password' => 'required|min:8'
         ]);
-
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email',$request->email)->first();
         if (Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => true,
@@ -50,12 +51,16 @@ class AuthController extends Controller
             'role' => $request->role
         ]);
         $user->assignRole($request->role);
-
+        $decrypted = array(
+            'name'=>$user->name,
+            'email'=>$user->email,
+            'role'=>$user->role,
+        );
         if ($user) {
             return response()->json([
                 'status' => true,
                 'message' => 'User created !',
-                'data' => $user
+                'data' => $decrypted
             ], 201);
         }
 
